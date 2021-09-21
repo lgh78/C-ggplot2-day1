@@ -1,0 +1,200 @@
+---
+title: "Basic Plots Part 1"
+author: "Ashwin Malshé"
+date: "21 September 2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+theme_set(theme_minimal())
+```
+
+The objective of this exercise is to create a few basic plots that are often used in statistical reporting.
+
+### Boxplot
+
+Boxplots show the distribution of a variable
+
+```{r}
+ggplot(mpg, aes(y = hwy)) +
+  geom_boxplot() 
+```
+
+
+Usually, boxplots for different levels of a discrete variable are more useful:
+
+```{r}
+ggplot(mpg, aes(x = manufacturer, y = hwy)) +
+  geom_boxplot()
+```
+
+We can change the color of the boxplots
+
+```{r}
+ggplot(mpg, aes(x = manufacturer, y = hwy)) +
+  geom_boxplot(color = "red")
+```
+
+Map `color` to `manufacturer`
+
+```{r}
+ggplot(mpg, aes(x = manufacturer, y = hwy, color = manufacturer)) +
+  geom_boxplot()
+```
+
+```{r}
+ggplot(mpg, aes(x = manufacturer, y = hwy, color = "red")) +
+  geom_boxplot()
+```
+
+
+**Fill** colors **inside** the boxplot
+
+```{r}
+ggplot(mpg, aes(x = manufacturer, y = hwy)) +
+  geom_boxplot(color = "red", fill = "blue")
+```
+
+Map `fill` to `manufacturer`
+
+```{r}
+ggplot(mpg, aes(x = manufacturer, y = hwy, fill = manufacturer)) +
+  geom_boxplot()
+```
+
+You have a lot of control over what to do with the outliers. Check out the documentation:
+https://ggplot2.tidyverse.org/reference/geom_boxplot.html
+
+
+### Bar graph
+
+The default use of a bar graph is to show the frequency distribution of a categorical variable. In case of `ggplot2`, the y axis is the frequency, which it calculates on its own. Thus, the frequency is a `stat` which `geom_bar()` uses as default Y axis.
+
+```{r}
+ggplot(mpg, aes(x = class)) +
+  geom_bar()
+```
+
+
+Bar plot on a continuous variable
+
+
+```{r}
+count(mpg, cyl)
+```
+
+
+```{r}
+ggplot(mpg, aes(x = cyl)) +
+  geom_bar()
+```
+
+Fix the problem in the above graph!
+
+
+```{r}
+ggplot(mpg, aes(x = as.character(cyl))) +
+  geom_bar()
+```
+
+Change color
+
+```{r}
+ggplot(mpg, aes(x = manufacturer)) +
+  geom_bar(color = "blue")
+```
+
+Change the fill
+
+```{r}
+ggplot(mpg, aes(x = manufacturer)) +
+  geom_bar(color = "blue", fill = "green")
+```
+
+Change transparency
+
+```{r}
+ggplot(mpg, aes(x = manufacturer)) +
+  geom_bar(color = "blue", fill = "green", alpha = 0.5)
+```
+
+Where do you get colors names from?
+
+Here is a nice cheatsheet:
+
+https://www.nceas.ucsb.edu/~frazier/RSpatialGuides/colorPaletteCheatsheet.pdf
+
+
+
+### Histogram
+
+Histogram is a bar plot for a continuous variable. Making a bar plot for a continuous variable doesn't make sense because the frequency of each unique value is likely to be very low. This leads to mostly a flat bar graph. Histogram solves this problem by creating bins from the continuous variable. It then plots the frequencies of these bins. A common example is to create bins of the ages of people in the sample.
+
+```{r}
+ggplot(mpg, aes(x = hwy)) +
+  geom_bar()
+```
+
+
+```{r}
+ggplot(mpg, aes(x = hwy)) +
+  geom_histogram()
+```
+
+### Scatterplot
+
+Scatterplot depicts the relationship between two continuous variables. Let's study 
+
+```{r}
+ggplot(mpg, aes(x = cty, y = hwy)) +
+  geom_point()
+```
+
+Add a trend line to the scatterplot
+
+```{r}
+ggplot(mpg, aes(x = cty, y = hwy)) +
+  geom_point() +
+  geom_smooth()
+```
+
+
+
+Adding the title, subtitle, and the caption is really easy.
+
+
+```{r}
+ggplot(mpg, aes(x = cty, y = hwy)) +
+  geom_point() +
+  labs(title = "City Miles vs Highway Miles",
+       subtitle = "Based on the data from 1999 and 2008",
+       caption = "Created by Ashwin Malshe using mpg dataset.
+       mpg dataset is included in ggplot2 package.",
+        x = "miles per gallon in city driving",
+        y = "miles per gallon in highway driving")
+```
+
+
+We can show subgroups by using various aesthetics. For example, we can color the points based on the drive of the cars.
+
+
+```{r}
+ggplot(mpg, aes(x = cty, y = hwy, color = drv)) +
+  geom_point() +
+  labs(title = "City Miles vs Highway Miles",
+       subtitle = "Based on the data from 1999 and 2008",
+       caption = "Created by Ashwin Malshe using mpg dataset.")
+```
+
+
+Finally, instead of showing the groups separately may make sense in some cases. This code will split the data into 3 groups based on the value of `drv` and then create a plot for each subgroup. This is known as a facet plot.
+
+
+```{r}
+ggplot(mpg, aes(x = cty, y = hwy, color = drv)) +
+  geom_point() +
+  facet_wrap(~ drv)
+```
+

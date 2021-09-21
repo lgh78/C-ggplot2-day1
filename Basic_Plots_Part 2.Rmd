@@ -1,0 +1,109 @@
+---
+title: "Bar plots"
+author: "Ashwin Malshé"
+date: "21 September 2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+### Bar graph
+
+As seen previously, bar graphs are used when we have a categorical variable.
+
+
+What happens when you have already created summary statistics for making a bar plot?
+
+```{r}
+mpgSum <- mpg %>%
+  group_by(manufacturer) %>% 
+  summarise(hwy_mean = mean(hwy),
+            hwy_n    = n())
+
+head(mpgSum)
+```
+
+Can we now use the summarized data to plot hwy_n on y axis?
+
+```{r}
+ggplot(mpgSum, aes(x = manufacturer, y = hwy_n)) +
+  geom_bar()
+
+```
+
+Correct the plot above
+
+```{r}
+ggplot(mpgSum, aes(x = manufacturer, y = hwy_n)) +
+  geom_bar(stat = "identity")
+```
+
+OR you could also use a different `geom`
+
+```{r}
+ggplot(mpgSum, aes(x = manufacturer, y = hwy_n)) +
+  geom_col()
+```
+
+
+Now with the new tool, you can also create bar plot with *any* Y axis variable you want
+
+```{r}
+ggplot(mpgSum, aes(x = manufacturer, y = hwy_mean)) +
+  geom_col()
+
+```
+
+If you don't want to create an intermediate data set, use magrittr pipe
+
+```{r}
+mpg %>%
+  group_by(manufacturer) %>% 
+  summarise(hwy_mean = mean(hwy),
+            hwy_n    = n()) %>% 
+  ggplot(aes(x = manufacturer, y = hwy_mean)) +
+    geom_col()
+
+```
+
+In the above bar graph, we can introduce colors for `drv` which is `c("4", "f", "r")`
+
+```{r}
+mpg %>%
+  group_by(manufacturer, drv) %>% 
+  summarise(hwy_mean = mean(hwy),
+            hwy_n    = n()) %>% 
+  ggplot(aes(x = manufacturer, y = hwy_mean)) +
+    geom_col(aes(fill = drv))
+```
+
+
+Remove the legend
+
+```{r}
+mpg %>%
+  group_by(manufacturer, drv) %>% 
+  summarise(hwy_mean = mean(hwy),
+            hwy_n    = n()) %>% 
+  ggplot(aes(x = manufacturer, y = hwy_mean)) +
+    geom_col(aes(fill = drv), show.legend = FALSE)
+
+```
+
+Add labels to the bars
+
+```{r}
+mpg %>%
+  group_by(manufacturer, drv) %>% 
+  summarise(hwy_mean = mean(hwy),
+            hwy_n    = n()) %>% 
+  ggplot(aes(x = manufacturer, y = hwy_mean)) +
+  geom_col(aes(fill = drv)) +
+  geom_text(aes(label = round(hwy_mean, 1),
+                group = drv),
+                position = position_stack(vjust = 0.5))
+```
+

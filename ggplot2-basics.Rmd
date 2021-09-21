@@ -1,0 +1,115 @@
+---
+title: "ggplot2-basics"
+author: "Ashwin Malshe"
+date: "21 September 2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+
+## The structure of a `ggplot2` plot
+
+```{r eval = FALSE}
+
+ggplot(data = ,
+       mapping = aes()) +
+  geom_*() +
+  scale_*() +
+  labs() + 
+  facet_*() +
+  theme()
+
+```
+
+
+## `mpg` dataset
+
+Let's start with a dataset named `mpg` that comes bundled with `ggplot2`
+
+Get the variable names
+
+```{r}
+names(mpg)
+```
+
+Check the `class` of each variable in `mpg`
+
+```{r}
+sapply(mpg, class)
+```
+
+
+## `ggplot()` function
+
+
+`ggplot()` is the key function in `ggplot2`. If you execute the following chunk, you will get a gray box as an output. This is a standard output from `ggplot()` in the absence of any information on the data.
+
+```{r}
+ggplot()
+```
+
+
+`ggplot()` uses `data` and `mapping` arguments to create the base layer for a plot. Giving `data` alone won't output anything informative.
+
+
+```{r}
+ggplot(data = mpg)
+```
+
+We need to provide the mapping from the data to aesthetics. This is not always required because some `geoms` will have their own default statistics mapping to the aesthetic. Consider this as a case where a `geom` creates a variable from the data and then uses that to make the plot.
+
+In the next chunk, we provide the mapping from `cty` to the X axis and `hwy` to the Y axis. This will lead to a more informative plot compared to a large gray box!
+
+
+```{r}
+ggplot(data = mpg,
+       mapping = aes(x = cty, y = hwy))
+```
+
+
+We still don't know what we want to show on the plot. However, now we can start to think about the possible visualizations. Both `cty` and `hwy` are continuous variables. So making a scatterplot to show their relationship will be informative.
+
+We do that by **adding** `geom_point()` to `ggplot()`
+
+Note two important aspects here:
+
+1. We add a layer to a `ggplot` by using a `+` sign. This is not a ` %>% `! People make this mistake very often so be careful here.
+
+2. We don't provide any `data` or `mapping` to `geom_point()`. This is because all the layers inherit these arguments from `ggplot()`. So you don't have to keep on specifying them in each layer.
+
+*Important: You can specify `data ` and `mapping` inside any `geom_`. It will not be passed on to any other layer. It will remain confined to that layer alone.*
+
+
+```{r}
+ggplot(data = mpg, mapping = aes(x = cty, y = hwy)) +
+  geom_point()
+```
+
+This is the same as above:
+
+```{r}
+ggplot() +
+  geom_point(data = mpg, mapping = aes(x = cty, y = hwy))
+```
+
+
+Note that we can add another layer and it will inherit the data and mapping from `ggplot` again.
+
+```{r}
+ggplot(data = mpg, mapping = aes(x = cty, y = hwy)) +
+  geom_point() +
+  geom_line()
+```
+
+But if `ggplot()` doesn't specify them, subsequent layers don't inherit anything from another layers. So in the code below, the line doesn't show.
+
+```{r}
+ggplot() +
+  geom_point(data = mpg, mapping = aes(x = cty, y = hwy)) +
+  geom_line()
+```
+
